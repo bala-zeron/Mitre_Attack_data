@@ -7,7 +7,9 @@ from rest_framework import views
 from rest_framework.response import Response
 from django.http import JsonResponse
 from pyattck import Attck
+from datetime import date
 import json
+import os
 # from api.serializers import YourSerializer
 
 """
@@ -16,16 +18,20 @@ This package extracts details from the MITRE Enterprise, PRE-ATT&CK, Mobile, and
 The below code basically uses the pyattck package and fetches data based on the requirements.
 """
 class MyAttckView(views.APIView):
+	"""
+	View to fetch the necessary data and store it in a JSON file to reduce time taken to
+	search the Mitre ATT&CK database
+	"""
 	def get(self, request):
 		attack = Attck()
 
 		result_dict = {}
 		for technique in attack.enterprise.techniques:
 			# print(technique.last_updated)
+			import pdb; pdb.set_trace()
 			tech_dict = {}
+			tech_dict["technique_mitre_id"] = technique.technique_id
 			for subtechnique in technique.techniques:
-				# print(subtechnique.id)
-				# print(subtechnique.name)
 				tech_dict["technique_name"] = subtechnique.name
 				tech_dict["created"] = subtechnique.created
 				tech_dict["modified"] = subtechnique.modified
@@ -40,7 +46,50 @@ class MyAttckView(views.APIView):
 					
 			result_dict[technique.technique_id] = tech_dict
 
-		result = json.dumps(result_dict, indent=4)
+		# result = json.dumps(result_dict, indent=4)
 		# serializer_class = YourSerializer(result, many=True)
 		# import pdb; pdb.set_trace()
-		return JsonResponse(result, safe=False)
+
+		file = 'data_output.json'
+
+		isFile = os.path.isfile(file)
+		if isFile: 
+			os.remove("data_output.json")
+		with open("data_output.json", "w") as outfile:
+			json.dump(result_dict, outfile, indent=4)
+		return Response(result_dict)
+
+
+class MitreAttck(views.APIView):
+	"""
+	View to get the data stored in JSON format created by the previous API and return the searched data
+	"""
+	def get(self, request):
+		id = request.GET['id']
+
+		data = open('data_output.json')
+
+		raw = json.load(data)
+
+		data_set = raw.get(id)
+
+		return Response(data_set)
+
+	def post(self, request):
+		malware = request.POST['malware_name']
+		mitigation = request.POST['mitigation']
+
+		if malware:
+			param = malware
+		else:
+			param = mitigation
+		data = open('data_output.json')
+
+		raw = json.load(data)
+		
+		result_list = []
+		for value in raw:
+			if param in raw[value].values():
+				result_list.append(raw[value])
+
+		return Response(result_list)
