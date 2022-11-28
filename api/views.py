@@ -65,13 +65,15 @@ class MitreAttck(views.APIView):
 	View to get the data stored in JSON format created by the previous API and return the searched data
 	"""
 	def get(self, request):
-		id = request.GET['id']
-
+		id = request.GET['id'].split(',')
 		data = open('data_output.json')
 
 		raw = json.load(data)
 
-		data_set = raw.get(id)
+		# data_set = [raw.get(i) for i in id]
+		data_set = []
+		for i in id:
+			data_set.append(raw.get(i))
 
 		return Response(data_set)
 
@@ -79,6 +81,7 @@ class MitreAttck(views.APIView):
 		malware = request.POST['malware_name']
 		mitigation = request.POST['mitigation']
 
+		# import pdb; pdb.set_trace()
 		if malware:
 			param = malware
 		else:
