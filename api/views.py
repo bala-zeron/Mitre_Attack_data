@@ -24,7 +24,7 @@ class MyAttckView(views.APIView):
 	"""
 	def get(self, request):
 		attack = Attck()
-		import pdb; pdb.set_trace()
+		# import pdb; pdb.set_trace()
 		result_dict = {}
 		for technique in attack.enterprise.techniques:
 			# print(technique.last_updated)
