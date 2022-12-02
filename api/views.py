@@ -28,8 +28,10 @@ class MitreAttckView(views.APIView):
 			mitre_id: {
 				"name": result.name,
 				"description": result.description,
-				"permissions": result.permissions,
-				"platforms": result.platforms,
+				"permissions": result.x_mitre_permissions_required,
+				"stix": result.stix,
+				"data_source": result.x_mitre_data_sources,
+				"detections": result.possible_detections,
 
 				# "tactics": dict([
 				# 	(tactic.id , tactic.name)  for tactic in result.tactics
@@ -37,8 +39,10 @@ class MitreAttckView(views.APIView):
 				# "subtechnique": dict([
 				# 	(subtechnique.id , subtechnique.name)  for subtechnique in result.subtechnique
 				# ]),
+				# "mitigations" : result.mitigations,
+				# "actors" : result.actors,
 
-				"wiki": result.wiki,
+				"external_reference": result.external_reference,
 			}
 		}
 		endtime = datetime.now()

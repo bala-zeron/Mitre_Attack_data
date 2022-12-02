@@ -13,6 +13,6 @@ def load_mitre_attck():
     result_dict = {}
 
     for technique in attack.enterprise.techniques:
-        result_dict[technique.id] = technique
+        result_dict[technique.technique_id] = technique
 
     return result_dict
